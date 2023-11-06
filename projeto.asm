@@ -119,7 +119,7 @@ funcaoCensura: ; funcao para censurar pixels de uma linha
 
     add ecx, 3
     cmp ecx, edx
-    jle pintar_pixel
+    jl pintar_pixel ; se pos_x <= pixel < pos_x+w_ret, o pixel eh censurado
 
     mov esp, ebp
     pop ebp
@@ -222,7 +222,7 @@ start:
     cmp contLinhas, ebx
     jge copia_linha
 
-    ; se pos_y < contLinhas < pos_y+h_ret, entao eh feita a censura nas linhas
+    ; se pos_y <= contLinhas < pos_y+h_ret, entao eh feita a censura nas linhas
     push offset linhaImg
     push pos_x
     push w_ret
