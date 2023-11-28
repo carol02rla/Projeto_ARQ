@@ -86,10 +86,11 @@ calculaLargura: ; funcao para calcular largura da imagem
 
     mov edx, DWORD PTR[ebp+8]
     mov DWORD PTR [ebp-4], edx
-    mov al, BYTE PTR[edx + 0]
-    mov ah, BYTE PTR[edx + 1]
+    mov al, BYTE PTR[edx + 0] ; armazena o byte menos significativo lido no fileBuffer em al
+    mov ah, BYTE PTR[edx + 1] ; armazena o segundo byte menos significativo em ah
 
-    mov ebx, 3
+    ; ax contem o valor da largura da imagem e eh multiplicado por 3 para ter a largura em pixels
+    mov ebx, 3  ; EAX = EAX*EBX
     mul ebx
 
     mov esp, ebp
@@ -105,9 +106,9 @@ funcaoCensura: ; funcao para censurar pixels de uma linha
     mov ebx, DWORD PTR[ebp + 12]
     mov edx, DWORD PTR[ebp + 8]
 
-    mov DWORD PTR[ebp - 4], edx
+    mov DWORD PTR[ebp - 4], eax
     mov DWORD PTR[ebp - 8], ebx
-    mov DWORD PTR[ebp - 12], eax
+    mov DWORD PTR[ebp - 12], edx
 
     mov ecx, ebx
     add edx, ebx ; armazena em edx o limite do pixel a ser pintado (pos_x+w_ret)
@@ -184,7 +185,7 @@ start:
     invoke atodw, addr inputVar
     mov h_ret, eax
 
-    ; manipulacao de arquivos (abertura-leitura-escrita)
+    ; manipulacao de arquivos (abertura-leitura-escrita dos bytes do cabecalho)
     invoke CreateFile, addr fileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL
     mov fileHandle, eax
 
@@ -213,7 +214,6 @@ start:
     cmp readCount, 0 ; se readCount = 0, o arquivo chegou ao fim
     je fim_leitura_escrita
 
-    add contLinhas, 1
     mov ebx, pos_y
 
     cmp contLinhas, ebx
@@ -233,6 +233,7 @@ start:
     ; para as demais linhas, eh feita uma copia da linha da imagem de entrada
     invoke WriteFile, outFileHandle, addr linhaImg, larguraImg, addr writeCount, NULL
 
+    add contLinhas, 1
     jmp loop_leitura_escrita
 
   fim_leitura_escrita:
